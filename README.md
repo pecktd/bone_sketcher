@@ -50,6 +50,9 @@ selection, and its normal faces the active camera.
 - **Rotate 90**: rolls the plane 90° about its Y axis. Use it on round shapes where
   the fitted orientation is ambiguous.
 - **Swap Normal Z <> X**: swaps the plane's X and Z axes without moving the plane.
+- **Flip Root <> Tip**: swaps the root and the aim handle so the plane's Y points
+  the other way. The plane covers the same area, the normal and roll are kept,
+  and points already drawn stay where they are.
 - **Isolate Selected + Sketch**: shows only the fitted components, the sketch and the
   joints made by the tool. Click again to turn it off.
 - **Views**: orthographic cameras locked to the plane (Top, Bottom, Front, Back,

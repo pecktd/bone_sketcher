@@ -395,6 +395,29 @@ def rotate_plane_90() -> None:
     _restore_sketch_point_world_positions(point_positions)
 
 
+def flip_direction() -> None:
+    """Swap the root and the tip (aim handle), so the plane's Y points the other way.
+
+    The root turns 180 degrees about its own Z, so the plane normal is kept,
+    and moves to the far end of the drawing surface; the aim handle keeps its
+    distance, now pointing back (by default it lands where the root was). The up
+    handle keeps its offset from the root, so the roll is kept. The drawing
+    surface covers the same area and placed points stay where they are.
+    """
+    plane = require_plane()
+    point_positions = _sketch_point_world_positions(plane)
+    old_root = om.MVector(*mc.xform(PLANE_ROOT, q=True, t=True, ws=True))
+    to_tip = om.MVector(*mc.xform(AIM_HANDLE, q=True, t=True, ws=True)) - old_root
+    up_offset = om.MVector(*mc.xform(UP_HANDLE, q=True, t=True, ws=True)) - old_root
+    new_root = old_root + to_tip.normal() * plane_dimensions(plane)[1]
+
+    mc.rotate(0.0, 0.0, 180.0, PLANE_ROOT, r=True, os=True)
+    mc.xform(PLANE_ROOT, t=mvec_to_tuple(new_root), ws=True)
+    mc.xform(AIM_HANDLE, t=mvec_to_tuple(new_root - to_tip), ws=True)
+    mc.xform(UP_HANDLE, t=mvec_to_tuple(new_root + up_offset), ws=True)
+    _restore_sketch_point_world_positions(point_positions)
+
+
 def swap_normal() -> bool:
     """Swap the frame's X and Z axes while the visible plane stays exactly where it is.
 
@@ -1524,6 +1547,12 @@ def ui():
         "Press again to swap back.",
     )
     mc.setParent("..")
+    mc.button(
+        l="Flip Root <> Tip",
+        c=lambda *_: _run(flip_direction),
+        ann="Swap the root and the tip (aim handle) so the plane's Y points the other way.\n"
+        "The plane covers the same area and the normal is kept. Placed points stay where they are.",
+    )
     mc.button(
         l="Isolate Selected + Sketch",
         c=lambda *_: _run(toggle_isolate),
